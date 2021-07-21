@@ -2,61 +2,81 @@ package com.solarisbank.demo.codewithme.smell;
 
 public class LongMethodSmell {
 
-    private static class LongMethodSmellDto {
-        String Name;
-        int Quality;
-        int SellIn;
+    public static final String BACKSTAGE_NAME = "Backstage passes to a TAFKAL80ETC concert";
+    public static final String SULFURAS_NAME = "Sulfuras, Hand of Ragnaros";
+    public static final String AGED_BRIE_NAME = "Aged Brie";
+
+    private static class LongMethodSmellItem {
+        String name;
+        int quality;
+        int sellIn;
     }
 
-    public void UpdateQuality(LongMethodSmellDto[] Items) {
-        for (var i = 0; i < Items.length; i++) {
-            if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert") {
-                if (Items[i].Quality > 0) {
-                    if (Items[i].Name != "Sulfuras, Hand of Ragnaros") {
-                        Items[i].Quality = Items[i].Quality - 1;
-                    }
+    public void updateQuality(LongMethodSmellItem[] items) {
+        for (LongMethodSmellItem item : items) {
+            preprocessQuantity(item);
+            processSellIn(item);
+            postProcessQuantity(item);
+        }
+    }
+
+    private void postProcessQuantity(LongMethodSmellItem item) {
+        if (item.sellIn < 0) {
+            if (isNameNotEqual(item, AGED_BRIE_NAME)) {
+                if (isNameEqual(item, BACKSTAGE_NAME)) {
+                    decreaseQuantityIfNotSulfuras(item);
+                } else {
+                    item.quality = 0;
                 }
             } else {
-                if (Items[i].Quality < 50) {
-                    Items[i].Quality = Items[i].Quality + 1;
-
-                    if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert") {
-                        if (Items[i].SellIn < 11) {
-                            if (Items[i].Quality < 50) {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-
-                        if (Items[i].SellIn < 6) {
-                            if (Items[i].Quality < 50) {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-                    }
-                }
+                increaseQuantityIfLessThan50(item);
             }
+        }
+    }
 
-            if (Items[i].Name != "Sulfuras, Hand of Ragnaros") {
-                Items[i].SellIn = Items[i].SellIn - 1;
-            }
+    private void processSellIn(LongMethodSmellItem item) {
+        if (isNameNotEqual(item, SULFURAS_NAME)) {
+            item.sellIn = item.sellIn - 1;
+        }
+    }
 
-            if (Items[i].SellIn < 0) {
-                if (Items[i].Name != "Aged Brie") {
-                    if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert") {
-                        if (Items[i].Quality > 0) {
-                            if (Items[i].Name != "Sulfuras, Hand of Ragnaros") {
-                                Items[i].Quality = Items[i].Quality - 1;
-                            }
-                        }
-                    } else {
-                        Items[i].Quality = Items[i].Quality - Items[i].Quality;
+    private void preprocessQuantity(LongMethodSmellItem item) {
+        if (isNameNotEqual(item, AGED_BRIE_NAME) && isNameNotEqual(item, BACKSTAGE_NAME)) {
+            decreaseQuantityIfNotSulfuras(item);
+        } else {
+            if (item.quality < 50) {
+                item.quality++;
+                if (isNameEqual(item, BACKSTAGE_NAME)) {
+                    if (item.sellIn < 11) {
+                        increaseQuantityIfLessThan50(item);
                     }
-                } else {
-                    if (Items[i].Quality < 50) {
-                        Items[i].Quality = Items[i].Quality + 1;
+
+                    if (item.sellIn < 6) {
+                        increaseQuantityIfLessThan50(item);
                     }
                 }
             }
         }
     }
+
+    private void decreaseQuantityIfNotSulfuras(LongMethodSmellItem item) {
+        if (item.quality > 0 && isNameNotEqual(item, SULFURAS_NAME)) {
+            item.quality--;
+        }
+    }
+
+    private void increaseQuantityIfLessThan50(LongMethodSmellItem item) {
+        if (item.quality < 50) {
+            item.quality++;
+        }
+    }
+
+    private boolean isNameEqual(LongMethodSmellItem item, String name) {
+        return item.name.equals(name);
+    }
+
+    private boolean isNameNotEqual(LongMethodSmellItem item, String name) {
+        return !isNameEqual(item, name);
+    }
+
 }
