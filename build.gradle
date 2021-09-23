@@ -1,11 +1,12 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.2'
+	id 'org.springframework.boot' version '2.5.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'maven-publish'
 }
 
 group = 'com.solarisbank.demo'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.3-SNAPSHOT'
 sourceCompatibility = '11'
 
 repositories {
@@ -17,6 +18,24 @@ dependencies {
 	implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+publishing {
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/eugine/code-with-me")
+			credentials {
+				username = project.findProperty("gpr.user") ?: System.getenv("GH_USERNAME")
+				password = project.findProperty("gpr.key") ?: System.getenv("GH_TOKEN")
+			}
+		}
+	}
+	publications {
+		gpr(MavenPublication) {
+			from(components.java)
+		}
+	}
 }
 
 test {
